@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ecommerce Completo</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- FontAwesome para iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- Hoja de estilos personalizada -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- jsPDF para generar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <header class="bg-dark text-white fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark container">
+      <!-- Logo -->
+      <a class="navbar-brand" href="#">
+        <img src="https://cdn-icons-png.freepik.com/256/11181/11181797.png?semt=ais_hybrid" alt="Logo" width="30" height="30" class="d-inline-block align-top">
+        MiEcommerce
+      </a>
+      <!-- Botón responsive -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- Menú de navegación -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#categorias">Categorías</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-toggle="modal" data-target="#cartModal">
+              <i class="fas fa-shopping-cart"></i>
+              <span id="cart-count" class="badge badge-danger">0</span>
+            </a>
+          </li>
+        </ul>
+        <!-- Campo de búsqueda -->
+        <form class="form-inline my-2 my-lg-0 ml-3">
+          <input id="search-input" class="form-control mr-sm-2" type="search" placeholder="Buscar productos..." aria-label="Buscar">
+        </form>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="container mt-5 pt-5">
+    <!-- Sección de Inicio -->
+    <section id="inicio" class="my-5 text-center">
+      <h1 class="display-4">¡Bienvenido a MiEcommerce!</h1>
+      <p class="lead">Descubre una amplia variedad de productos de calidad.</p>
+    </section>
+
+    <!-- Sección de Categorías -->
+    <section id="categorias" class="my-5">
+      <h2 class="mb-4">Productos</h2>
+      <div id="product-container" class="row">
+        <!-- Las tarjetas de productos se generarán dinámicamente aquí -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal para seleccionar cantidad antes de añadir al carrito -->
+  <div class="modal fade" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="quantityModalLabel" class="modal-title">Selecciona la cantidad</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="quantity-input" type="number" min="1" value="1" class="form-control">
+        </div>
+        <div class="modal-footer">
+          <button id="add-to-cart-confirm" type="button" class="btn btn-primary" data-dismiss="modal">Añadir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal del Carrito -->
+  <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="cartModalLabel" class="modal-title">Tu Carrito</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Lista de productos en el carrito -->
+          <div id="cart-items"></div>
+          <h4 class="mt-3">Total: $<span id="cart-total">0.00</span></h4>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" data-toggle="modal" data-target="#paymentModal" data-dismiss="modal">Pagar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Pago -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="paymentModalLabel" class="modal-title">Formulario de Pago</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="payment-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="payer-name">Nombre Completo</label>
+              <input type="text" id="payer-name" class="form-control" placeholder="Tu nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="card-number">Número de Tarjeta</label>
+              <input type="text" id="card-number" class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX" required>
+            </div>
+            <div class="form-group">
+              <label for="card-expiration">Fecha de Expiración</label>
+              <input type="text" id="card-expiration" class="form-control" placeholder="MM/AA" required>
+            </div>
+            <div class="form-group">
+              <label for="card-cvv">CVV</label>
+              <input type="text" id="card-cvv" class="form-control" placeholder="XXX" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Finalizar Compra y Generar Factura PDF</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap y dependencias JavaScript -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Script personalizado -->
+  <script src="script.js"></script>
+</body>
+</html>
